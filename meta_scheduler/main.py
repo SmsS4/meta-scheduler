@@ -6,6 +6,7 @@ from temporalio.worker import UnsandboxedWorkflowRunner
 from temporalio.worker import Worker
 
 from meta_scheduler import settings
+from meta_scheduler.steps import exec
 from meta_scheduler.steps import recv
 from meta_scheduler.utils.logger import get_logger
 
@@ -21,13 +22,13 @@ async def main():
     workflows = []
     activities = []
 
-    steps = [recv]
+    steps = [recv, exec]
 
     for step_name in settings.scheduler.steps:
         logger.info("Add step: %s", step_name)
         for step_module in steps:
-            if step_module.Workflow.NAME == step_name:
-                workflow, activity = step_module.Workflow.get_and_check()
+            if step_module.NAME == step_name:
+                workflow, activity = step_module.get()
                 workflows.append(workflow)
                 activities.extend(activity)
                 break
@@ -45,6 +46,13 @@ async def main():
         #     )
         # ),
     )
+
+    # await client.start_workflow(
+    #     recv.Workflow.run,
+    #     recv.Input("test", b"abca", ["EURUSD"]),
+    #     id="abc",
+    #     task_queue=settings.temporal.task_queue,
+    # )
 
     logger.info(
         "Register worker on task queue: %s namespace: %s",
