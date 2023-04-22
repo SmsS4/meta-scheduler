@@ -4,9 +4,9 @@ from temporalio import workflow
 
 from meta_scheduler.utils.logger import get_logger
 
-logger = get_logger("recv")
-
 NAME = "recv"
+
+logger = get_logger(NAME)
 
 
 @dataclass(slots=True)
