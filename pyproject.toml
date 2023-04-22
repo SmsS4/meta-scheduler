@@ -2,7 +2,7 @@
 name = "meta-scheduler"
 version = "0.1.0"
 description = ""
-authors = ["SmsS 4<smss.lite@gmail.com>"]
+authors = ["SmsS4 <smss.lite@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.11"
@@ -11,11 +11,13 @@ sqladmin = "0.10.1"
 SQLAlchemy = "2.0.9"
 dynaconf = "3.1.12"
 glogger = {path = "glogger", develop=true}
+temporalio = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "7.3.0"
 ipython = "8.12.0"
 pre-commit = "3.2.2"
+neovim = "^0.3.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

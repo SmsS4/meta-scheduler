@@ -1,4 +1,5 @@
 import dynaconf
+from temporalio import workflow
 
 all_settings = dynaconf.Dynaconf(
     settings_files=["settings.yaml", ".secrets.yaml"],
@@ -9,6 +10,8 @@ all_settings = dynaconf.Dynaconf(
 )
 
 db = all_settings.DB
+scheduler = all_settings.SCHEDULER
+temporal = all_settings.TEMPORAL
 
 # TODO better validators
 all_settings.validators.register(
