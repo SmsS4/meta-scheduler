@@ -1,8 +1,7 @@
+from example import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
-
-from example import settings
 
 
 def get_url() -> str:
