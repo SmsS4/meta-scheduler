@@ -1,5 +1,7 @@
 [pylint]
 disable=
+  no-method-argument,
+  duplicate-code,
   too-few-public-methods,
   too-many-function-args,
   unexpected-keyword-arg,

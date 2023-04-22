@@ -1,5 +1,4 @@
 import dynaconf
-from temporalio import workflow
 
 all_settings = dynaconf.Dynaconf(
     settings_files=["settings.yaml", ".secrets.yaml"],

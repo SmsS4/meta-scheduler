@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 from temporalio.client import Client
 from temporalio.worker import UnsandboxedWorkflowRunner
@@ -25,14 +26,14 @@ async def main():
     for step_name in settings.scheduler.steps:
         logger.info("Add step: %s", step_name)
         for step_module in steps:
-            if step_module.NAME == step_name:
-                workflow, activity = step_module.get_and_check()
-                workflows.extend(workflow)
+            if step_module.Workflow.NAME == step_name:
+                workflow, activity = step_module.Workflow.get_and_check()
+                workflows.append(workflow)
                 activities.extend(activity)
                 break
         else:  # no-break
-            logger.error("Unknown step: %s", step)
-            exit(1)
+            logger.error("Unknown step: %s", step_name)
+            sys.exit(1)
 
     client = await Client.connect(
         f"{settings.temporal.HOST}:{settings.temporal.PORT}",
