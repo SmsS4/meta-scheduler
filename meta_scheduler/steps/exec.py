@@ -1,11 +1,11 @@
 import datetime
 import os
-from dataclasses import dataclass
 
 from temporalio import activity
 from temporalio import workflow
 
 from meta_scheduler import settings
+from meta_scheduler.models import file
 from meta_scheduler.models import mql
 from meta_scheduler.utils import command
 from meta_scheduler.utils import stepping
@@ -39,7 +39,9 @@ PATHS_TO_CLEAN = [
 STRATEGY = "strategy"
 
 CONFIG_PATH = os.path.join(settings.meta.path, "config.ini")
-EX5_PATH = os.path.join(settings.meta.path, "MQL5", "Experts", f"{STRATEGY}.ex5")
+EX5_PATH = os.path.join(
+    settings.meta.path, "MQL5", "Experts", f"{STRATEGY}.ex5"
+)
 TERMINAL_PATH = os.path.join(settings.meta.path, "terminal64.exe")
 
 
@@ -111,31 +113,14 @@ async def write_strategy(ex5: bytes):
 
 @activity.defn
 async def run_strategy(strategy: mql.Strategy):
-    command.run("wine", f"{TERMINAL_PATH}", f"/config:C:\\meta\\config.ini /portable")
+    command.run(
+        "wine", f"{TERMINAL_PATH}", f"/config:C:\\meta\\config.ini /portable"
+    )
 
 
-class FileType:
-    XML = 1
-    CACHE = 2
-    CONFIG = 3
-    AGENT_LOG = 4
-    TESTER_LOG = 5
-    MANAGER_LOG = 6
-    TERMINAL_LOG = 7
-    BACKTEST_RESULT = 8
-    BACKTEST_IMAGES = 9
-
-
-@dataclass(frozen=True, slots=True)
-class File:
-    path: str
-    data: bytes
-    type: int
-
-
-def collect_file(path: str, file_type: int):
+def collect_file(path: str, file_type: int) -> file.File:
     with open(path, "rb") as f:
-        return File(path=path, data=f.read(), type=file_type)
+        return file.File(path=path, data=f.read(), type=file_type)
 
 
 def get_file_in_folder(path: str) -> str:
@@ -146,45 +131,49 @@ def get_file_in_folder(path: str) -> str:
 
 
 @activity.defn
-async def collect_result(opt: bool) -> list[File]:
+async def collect_result(opt: bool) -> list[file.File]:
     files = []
     files.append(
         collect_file(
             os.path.join(settings.meta.path, "config.ini"),
-            FileType.CONFIG,
+            file.FileType.CONFIG,
         )
     )
     files.append(
         collect_file(
             get_file_in_folder(os.path.join(settings.meta.path, "logs")),
-            FileType.TERMINAL_LOG,
+            file.FileType.TERMINAL_LOG,
         )
     )
     files.append(
         collect_file(
-            get_file_in_folder(os.path.join(settings.meta.path, "Tester", "cache")),
-            FileType.CACHE,
+            get_file_in_folder(
+                os.path.join(settings.meta.path, "Tester", "cache")
+            ),
+            file.FileType.CACHE,
         )
     )
     if opt:
         files.append(
             collect_file(
                 os.path.join(settings.meta.path, "MQL5", "report.xml"),
-                FileType.XML,
+                file.FileType.XML,
             )
         )
     else:
         files.append(
             collect_file(
                 os.path.join(settings.meta.path, "MQL5", "report.htm"),
-                FileType.BACKTEST_RESULT,
+                file.FileType.BACKTEST_RESULT,
             )
         )
         for suffix in ["-holding", "-hst", "-mfemae", ""]:
             files.append(
                 collect_file(
-                    os.path.join(settings.meta.path, "MQL5", f"report{suffix}.png"),
-                    FileType.BACKTEST_IMAGES,
+                    os.path.join(
+                        settings.meta.path, "MQL5", f"report{suffix}.png"
+                    ),
+                    file.FileType.BACKTEST_IMAGES,
                 )
             )
 
@@ -194,7 +183,7 @@ async def collect_result(opt: bool) -> list[File]:
 @workflow.defn(name=NAME)
 class Workflow:
     @workflow.run
-    async def run(self, inp: mql.Strategy) -> list[File]:
+    async def run(self, inp: mql.Strategy) -> list[file.File]:
         logger.info("executing %s", inp.name)
         await workflow.execute_activity(
             clean,
@@ -223,4 +212,10 @@ class Workflow:
 
 
 def get() -> tuple:
-    return Workflow, [clean, write_config, write_strategy, run_strategy, collect_result]
+    return Workflow, [
+        clean,
+        write_config,
+        write_strategy,
+        run_strategy,
+        collect_result,
+    ]

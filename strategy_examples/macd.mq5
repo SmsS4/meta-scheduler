@@ -384,8 +384,8 @@ bool CSampleExpert::Processing(void)
    m_signal_previous=m_buff_MACD_signal[1];
    m_ema_current    =m_buff_EMA[0];
    m_ema_previous   =m_buff_EMA[1];
-//--- it is important to enter the market correctly, 
-//--- but it is more important to exit it correctly...   
+//--- it is important to enter the market correctly,
+//--- but it is more important to exit it correctly...
 //--- first check if position exists - try to select it
    if(m_position.Select(Symbol()))
      {
