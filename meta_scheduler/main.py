@@ -47,12 +47,40 @@ async def main():
         # ),
     )
 
-    # await client.start_workflow(
-    #     recv.Workflow.run,
-    #     recv.Input("test", b"abca", ["EURUSD"]),
-    #     id="abc",
-    #     task_queue=settings.temporal.task_queue,
-    # )
+    import os
+    from datetime import date
+
+    from meta_scheduler.models.mql import (CostFunction, Model, Optimization,
+                                           Period, Strategy)
+
+    with open("strategy_examples/macd.ex5", "rb") as f:
+        ex5 = f.read()
+    with open("strategy_examples/macd.set", "r") as f:
+        set_file = f.read()
+    from uuid import uuid4
+
+    try:
+        await client.start_workflow(
+            recv.Workflow.run,
+            recv.Input(
+                Strategy(
+                    ex5=ex5,
+                    name="test",
+                    period=Period.M15,
+                    model=Model.OHLC,
+                    optimization=(Optimization.DISABLED, Optimization.FAST_GENETIC)[1],
+                    cost_function=CostFunction.BALANCE_MAX,
+                    from_date=str(date(2020, 1, 2)),
+                    to_date=str(date(2021, 1, 1)),
+                    set_file=set_file,
+                ),
+                ["EURUSD"],
+            ),
+            id=str(uuid4()),
+            task_queue=settings.temporal.task_queue,
+        )
+    except:
+        pass
 
     logger.info(
         "Register worker on task queue: %s namespace: %s",

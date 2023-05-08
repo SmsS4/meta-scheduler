@@ -11,6 +11,7 @@ all_settings = dynaconf.Dynaconf(
 db = all_settings.DB
 scheduler = all_settings.SCHEDULER
 temporal = all_settings.TEMPORAL
+meta = all_settings.META
 
 # TODO better validators
 all_settings.validators.register(

@@ -1,0 +1,6 @@
+InpLots=0.1||0.1||0.010000||1.000000||N
+InpTakeProfit=50||50||1||500||N
+InpTrailingStop=30||30||1||50||Y
+InpMACDOpenLevel=3||3||1||30||N
+InpMACDCloseLevel=2||2||1||20||N
+InpMATrendPeriod=26||26||1||260||N
