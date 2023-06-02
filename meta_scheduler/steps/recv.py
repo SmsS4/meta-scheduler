@@ -7,6 +7,7 @@ from meta_scheduler.models import file
 from meta_scheduler.models import mql
 from meta_scheduler.steps import exec
 from meta_scheduler.steps import parse
+from meta_scheduler.steps import persiste_to_db
 from meta_scheduler.utils import stepping
 from meta_scheduler.utils.logger import get_logger
 
@@ -17,6 +18,7 @@ logger = get_logger(NAME)
 
 @dataclass(slots=True)
 class Input:
+    name: str
     strategy: mql.Strategy
     symbols: list[str]
 
@@ -40,23 +42,28 @@ class Workflow:
         if len(xmls) >= 2:
             raise ValueError("length of xmls is more than one")
         if len(xmls) == 1:
-            await workflow.execute_child_workflow(
+            xml = await workflow.execute_child_workflow(
                 parse.Workflow.run,
-                xml,
+                xmls[0],
                 id=stepping.get_id("parse"),
+            )
+            await workflow.execute_child_workflow(
+                persiste_to_db.Workflow.run,
+                args=[xml, inp.name],
+                id=stepping.get_id("persiste"),
             )
 
-        htms = list(
-            filter(lambda x: x.type == file.FileType.BACKTEST_RESULT, files)
-        )
-        if len(htms) >= 2:
-            raise ValueError("length of htms is more than one")
-        if len(htms) == 1:
-            await workflow.execute_child_workflow(
-                parse.Workflow.run,
-                htms[0],
-                id=stepping.get_id("parse"),
-            )
+        # htms = list(
+        #     filter(lambda x: x.type == file.FileType.BACKTEST_RESULT, files)
+        # )
+        # if len(htms) >= 2:
+        #     raise ValueError("length of htms is more than one")
+        # if len(htms) == 1:
+        #     await workflow.execute_child_workflow(
+        #         parse.Workflow.run,
+        #         htms[0],
+        #         id=stepping.get_id("parse"),
+        #     )
 
 
 def get() -> tuple:

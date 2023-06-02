@@ -1,7 +1,8 @@
-from example import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
+
+from meta_scheduler import settings
 
 
 def get_url() -> str:

@@ -8,6 +8,7 @@ from temporalio.worker import Worker
 from meta_scheduler import settings
 from meta_scheduler.steps import exec
 from meta_scheduler.steps import parse
+from meta_scheduler.steps import persiste_to_db
 from meta_scheduler.steps import recv
 from meta_scheduler.utils.logger import get_logger
 
@@ -17,13 +18,10 @@ interrupt_event = asyncio.Event()
 
 
 async def main():
-    # provider = TracerProvider()
-    # provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
-    # trace.set_tracer_provider(provider)
     workflows = []
     activities = []
 
-    steps = [recv, exec, parse]
+    steps = [recv, exec, parse, persiste_to_db]
 
     for step_name in settings.scheduler.steps:
         logger.info("Add step: %s", step_name)
@@ -40,12 +38,6 @@ async def main():
     client = await Client.connect(
         f"{settings.temporal.HOST}:{settings.temporal.PORT}",
         namespace=settings.temporal.NAMESPACE,
-        # interceptors=[TracingInterceptor()],
-        # runtime=Runtime(
-        #     telemetry=TelemetryConfig(
-        #         metrics=OpenTelemetryConfig(url=settings.OTEL_METRICS_ENDPOINT)
-        #     )
-        # ),
     )
 
     from datetime import date
@@ -68,6 +60,7 @@ async def main():
             await client.start_workflow(
                 recv.Workflow.run,
                 recv.Input(
+                    "test",
                     Strategy(
                         ex5=ex5,
                         name="test",
@@ -76,7 +69,7 @@ async def main():
                         optimization=(
                             Optimization.DISABLED,
                             Optimization.FAST_GENETIC,
-                        )[0],
+                        )[1],
                         cost_function=CostFunction.BALANCE_MAX,
                         from_date=str(date(2020, 1, 2)),
                         to_date=str(date(2021, 1, 1)),
