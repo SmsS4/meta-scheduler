@@ -42,13 +42,8 @@ async def main():
 
     from datetime import date
 
-    from meta_scheduler.models.mql import (
-        CostFunction,
-        Model,
-        Optimization,
-        Period,
-        Strategy,
-    )
+    from meta_scheduler.models.mql import (CostFunction, Model, Optimization,
+                                           Period, Strategy)
 
     with open("strategy_examples/macd.ex5", "rb") as f:
         ex5 = f.read()
@@ -56,11 +51,10 @@ async def main():
         set_file = f.read()
 
     try:
-        if True:
+        if False:
             await client.start_workflow(
                 recv.Workflow.run,
                 recv.Input(
-                    "test",
                     Strategy(
                         ex5=ex5,
                         name="test",

@@ -39,9 +39,7 @@ PATHS_TO_CLEAN = [
 STRATEGY = "strategy"
 
 CONFIG_PATH = os.path.join(settings.meta.path, "config.ini")
-EX5_PATH = os.path.join(
-    settings.meta.path, "MQL5", "Experts", f"{STRATEGY}.ex5"
-)
+EX5_PATH = os.path.join(settings.meta.path, "MQL5", "Experts", f"{STRATEGY}.ex5")
 TERMINAL_PATH = os.path.join(settings.meta.path, "terminal64.exe")
 
 
@@ -113,9 +111,7 @@ async def write_strategy(ex5: bytes):
 
 @activity.defn
 async def run_strategy(strategy: mql.Strategy):
-    command.run(
-        "wine", f"{TERMINAL_PATH}", f"/config:C:\\meta\\config.ini /portable"
-    )
+    command.run("wine", f"{TERMINAL_PATH}", f"/config:C:\\meta\\config.ini /portable")
 
 
 def collect_file(path: str, file_type: int) -> file.File:
@@ -147,9 +143,7 @@ async def collect_result(opt: bool) -> list[file.File]:
     )
     files.append(
         collect_file(
-            get_file_in_folder(
-                os.path.join(settings.meta.path, "Tester", "cache")
-            ),
+            get_file_in_folder(os.path.join(settings.meta.path, "Tester", "cache")),
             file.FileType.CACHE,
         )
     )
@@ -170,9 +164,7 @@ async def collect_result(opt: bool) -> list[file.File]:
         for suffix in ["-holding", "-hst", "-mfemae", ""]:
             files.append(
                 collect_file(
-                    os.path.join(
-                        settings.meta.path, "MQL5", f"report{suffix}.png"
-                    ),
+                    os.path.join(settings.meta.path, "MQL5", f"report{suffix}.png"),
                     file.FileType.BACKTEST_IMAGES,
                 )
             )

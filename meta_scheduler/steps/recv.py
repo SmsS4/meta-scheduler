@@ -18,7 +18,6 @@ logger = get_logger(NAME)
 
 @dataclass(slots=True)
 class Input:
-    name: str
     strategy: mql.Strategy
     symbols: list[str]
 
@@ -32,26 +31,27 @@ class Output:
 class Workflow:
     @workflow.run
     async def run(self, inp: Input) -> Output:
-        inp.strategy.symbol = inp.symbols[0]
-        files: list[file.File] = await workflow.execute_child_workflow(
-            exec.Workflow.run,
-            inp.strategy,
-            id=stepping.get_id("exec"),
-        )
-        xmls = list(filter(lambda x: x.type == file.FileType.XML, files))
-        if len(xmls) >= 2:
-            raise ValueError("length of xmls is more than one")
-        if len(xmls) == 1:
-            xml = await workflow.execute_child_workflow(
-                parse.Workflow.run,
-                xmls[0],
-                id=stepping.get_id("parse"),
+        for symbol in inp.symbols:
+            inp.strategy.symbol = symbol
+            files: list[file.File] = await workflow.execute_child_workflow(
+                exec.Workflow.run,
+                inp.strategy,
+                id=stepping.get_id("exec"),
             )
-            await workflow.execute_child_workflow(
-                persiste_to_db.Workflow.run,
-                args=[xml, inp.name],
-                id=stepping.get_id("persiste"),
-            )
+            xmls = list(filter(lambda x: x.type == file.FileType.XML, files))
+            if len(xmls) >= 2:
+                raise ValueError("length of xmls is more than one")
+            if len(xmls) == 1:
+                xml = await workflow.execute_child_workflow(
+                    parse.Workflow.run,
+                    xmls[0],
+                    id=stepping.get_id("parse"),
+                )
+                await workflow.execute_child_workflow(
+                    persiste_to_db.Workflow.run,
+                    args=[xml, inp.strategy.name],
+                    id=stepping.get_id("persiste"),
+                )
 
         # htms = list(
         #     filter(lambda x: x.type == file.FileType.BACKTEST_RESULT, files)
