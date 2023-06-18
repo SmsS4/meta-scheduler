@@ -95,6 +95,8 @@ services:
     ports:
       - "16686:16686"
       - "14268:14268"
+      - "4317:4317" # grpc
+      - "4318:4318" # http
     environment:
       - COLLECTOR_OTLP_ENABLED=true
   prometheus:

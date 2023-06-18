@@ -8,6 +8,7 @@ from temporalio.client import Client
 from backend import schemas
 from meta_scheduler import models
 from meta_scheduler import settings
+from meta_scheduler import temporal_client
 from meta_scheduler.models import mql
 from meta_scheduler.steps import recv
 from meta_scheduler.utils import db_session
@@ -31,10 +32,7 @@ def get_results():
 
 @router.post("/")
 async def new_strategy(strategy: schemas.Strategy):
-    client = await Client.connect(
-        f"{settings.temporal.HOST}:{settings.temporal.PORT}",
-        namespace=settings.temporal.NAMESPACE,
-    )
+    client = await temporal_client.get()
 
     await client.start_workflow(
         recv.Workflow.run,

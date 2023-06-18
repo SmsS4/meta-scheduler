@@ -1,11 +1,15 @@
 import asyncio
 import sys
 
+from prometheus_client import start_http_server
 from temporalio.client import Client
+from temporalio.runtime import OpenTelemetryConfig
 from temporalio.worker import UnsandboxedWorkflowRunner
 from temporalio.worker import Worker
 
+from meta_scheduler import metrics
 from meta_scheduler import settings
+from meta_scheduler import temporal_client
 from meta_scheduler.steps import exec
 from meta_scheduler.steps import parse
 from meta_scheduler.steps import persiste_to_db
@@ -18,6 +22,7 @@ interrupt_event = asyncio.Event()
 
 
 async def main():
+    start_http_server(7070)
     workflows = []
     activities = []
 
@@ -34,60 +39,19 @@ async def main():
         else:  # no-break
             logger.error("Unknown step: {}", step_name)
             sys.exit(1)
-
-    client = await Client.connect(
-        f"{settings.temporal.HOST}:{settings.temporal.PORT}",
-        namespace=settings.temporal.NAMESPACE,
-    )
-
-    from datetime import date
-
-    from meta_scheduler.models.mql import (
-        CostFunction,
-        Model,
-        Optimization,
-        Period,
-        Strategy,
-    )
-
-    with open("strategy_examples/macd.ex5", "rb") as f:
-        ex5 = f.read()
-    with open("strategy_examples/macd.set") as f:
-        set_file = f.read()
-
-    try:
-        if False:
-            await client.start_workflow(
-                recv.Workflow.run,
-                recv.Input(
-                    Strategy(
-                        ex5=ex5,
-                        name="test",
-                        period=Period.M15,
-                        model=Model.OHLC,
-                        optimization=(
-                            Optimization.DISABLED,
-                            Optimization.FAST_GENETIC,
-                        )[1],
-                        cost_function=CostFunction.BALANCE_MAX,
-                        from_date=str(date(2020, 1, 2)),
-                        to_date=str(date(2021, 1, 1)),
-                        set_file=set_file,
-                    ),
-                    ["EURUSD"],
-                ),
-                id="sag",  # str(uuid4()),
-                task_queue=settings.temporal.task_queue,
-            )
-    except:
-        pass
-
+    client = await temporal_client.get()
     logger.info(
         "Register worker on task queue: {} namespace: {}",
         settings.temporal.TASK_QUEUE,
         settings.temporal.NAMESPACE,
     )
-    # Run a worker for the workflow
+    metrics.worker.info(
+        {
+            "task_queue": settings.temporal.TASK_QUEUE,
+            "namespace": settings.temporal.NAMESPACE,
+        }
+    )
+
     async with Worker(
         client,
         task_queue=settings.temporal.TASK_QUEUE,
