@@ -39,7 +39,9 @@ PATHS_TO_CLEAN = [
 STRATEGY = "strategy"
 
 CONFIG_PATH = os.path.join(settings.meta.path, "config.ini")
-EX5_PATH = os.path.join(settings.meta.path, "MQL5", "Experts", f"{STRATEGY}.ex5")
+EX5_PATH = os.path.join(
+    settings.meta.path, "MQL5", "Experts", f"{STRATEGY}.ex5"
+)
 TERMINAL_PATH = os.path.join(settings.meta.path, "terminal64.exe")
 
 
@@ -47,7 +49,7 @@ TERMINAL_PATH = os.path.join(settings.meta.path, "terminal64.exe")
 async def clean():
     logger.info("Cleaning fodler")
     for folder in PATHS_TO_CLEAN:
-        logger.info("Cleaning %s", folder)
+        logger.info("Cleaning {}", folder)
         result = command.run(
             "rm",
             "-rf",
@@ -61,7 +63,7 @@ async def clean():
 
 @activity.defn
 async def write_config(strategy: mql.Strategy):
-    logger.info("Writing config to set file at %s", CONFIG_PATH)
+    logger.info("Writing config to set file at {}", CONFIG_PATH)
 
     with open(CONFIG_PATH, "w") as f:
         f.write(
@@ -103,7 +105,7 @@ async def write_config(strategy: mql.Strategy):
 
 @activity.defn
 async def write_strategy(ex5: bytes):
-    logger.info("Writing ex5 at %s", EX5_PATH)
+    logger.info("Writing ex5 at {}", EX5_PATH)
     with open(EX5_PATH, "wb") as f:
         f.write(ex5)
     logger.info("Writing done")
@@ -111,7 +113,9 @@ async def write_strategy(ex5: bytes):
 
 @activity.defn
 async def run_strategy(strategy: mql.Strategy):
-    command.run("wine", f"{TERMINAL_PATH}", f"/config:C:\\meta\\config.ini /portable")
+    command.run(
+        "wine", f"{TERMINAL_PATH}", f"/config:C:\\meta\\config.ini /portable"
+    )
 
 
 def collect_file(path: str, file_type: int) -> file.File:
@@ -143,7 +147,9 @@ async def collect_result(opt: bool) -> list[file.File]:
     )
     files.append(
         collect_file(
-            get_file_in_folder(os.path.join(settings.meta.path, "Tester", "cache")),
+            get_file_in_folder(
+                os.path.join(settings.meta.path, "Tester", "cache")
+            ),
             file.FileType.CACHE,
         )
     )
@@ -164,7 +170,9 @@ async def collect_result(opt: bool) -> list[file.File]:
         for suffix in ["-holding", "-hst", "-mfemae", ""]:
             files.append(
                 collect_file(
-                    os.path.join(settings.meta.path, "MQL5", f"report{suffix}.png"),
+                    os.path.join(
+                        settings.meta.path, "MQL5", f"report{suffix}.png"
+                    ),
                     file.FileType.BACKTEST_IMAGES,
                 )
             )
@@ -176,7 +184,7 @@ async def collect_result(opt: bool) -> list[file.File]:
 class Workflow:
     @workflow.run
     async def run(self, inp: mql.Strategy) -> list[file.File]:
-        logger.info("executing %s", inp.name)
+        logger.info("executing {}", inp.name)
         await workflow.execute_activity(
             clean,
             start_to_close_timeout=datetime.timedelta(seconds=10),

@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,6 +7,7 @@ from backend import routes
 
 def get_app():
     app = FastAPI()
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],

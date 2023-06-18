@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-from datetime import timedelta
-
 import xmltodict
 from temporalio import activity
 from temporalio import workflow

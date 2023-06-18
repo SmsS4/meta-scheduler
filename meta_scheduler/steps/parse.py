@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import timedelta
 
 import xmltodict
@@ -22,7 +21,8 @@ async def parse_xml(xml_file: file.File) -> opt.OptResult:
     rows = workbook["Worksheet"]["Table"]["Row"]
     headers = [cell["Data"]["#text"] for cell in rows[0]["Cell"]]
     headers = [
-        (header if header != "Equity DD %" else "drawdown") for header in headers
+        (header if header != "Equity DD %" else "drawdown")
+        for header in headers
     ]
     headers = list(map(str.lower, headers))
     headers = list(map(lambda x: x.replace(" ", "_"), headers))
@@ -32,7 +32,11 @@ async def parse_xml(xml_file: file.File) -> opt.OptResult:
         if len(row) != len(headers):
             raise Exception("failed to parse")
         for i in range(len(headers)):
-            data[headers[i]].append(row[i]["Data"]["#text"])
+            x = row[i]["Data"]
+            if "#text" in x:
+                data[headers[i]].append(x["#text"])
+            else:
+                data[headers[i]].append(0)
     return opt.OptResult(
         create_time=properties["Created"],
         version=properties["Version"],

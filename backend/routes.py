@@ -35,8 +35,6 @@ async def new_strategy(strategy: schemas.Strategy):
         f"{settings.temporal.HOST}:{settings.temporal.PORT}",
         namespace=settings.temporal.NAMESPACE,
     )
-    with open("strategy_examples/macd.ex5", "rb") as f:
-        ex5 = f.read()
 
     await client.start_workflow(
         recv.Workflow.run,

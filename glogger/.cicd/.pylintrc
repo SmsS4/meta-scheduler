@@ -1,2 +1,0 @@
-[pylint]
-disable=missing-module-docstring,missing-class-docstring,missing-function-docstring,invalid-name,use-implicit-booleaness-not-len,too-few-public-methods,no-else-return,broad-except

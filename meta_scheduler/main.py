@@ -24,7 +24,7 @@ async def main():
     steps = [recv, exec, parse, persiste_to_db]
 
     for step_name in settings.scheduler.steps:
-        logger.info("Add step: %s", step_name)
+        logger.info("Add step: {}", step_name)
         for step_module in steps:
             if step_module.NAME == step_name:
                 workflow, activity = step_module.get()
@@ -32,7 +32,7 @@ async def main():
                 activities.extend(activity)
                 break
         else:  # no-break
-            logger.error("Unknown step: %s", step_name)
+            logger.error("Unknown step: {}", step_name)
             sys.exit(1)
 
     client = await Client.connect(
@@ -42,8 +42,13 @@ async def main():
 
     from datetime import date
 
-    from meta_scheduler.models.mql import (CostFunction, Model, Optimization,
-                                           Period, Strategy)
+    from meta_scheduler.models.mql import (
+        CostFunction,
+        Model,
+        Optimization,
+        Period,
+        Strategy,
+    )
 
     with open("strategy_examples/macd.ex5", "rb") as f:
         ex5 = f.read()
@@ -78,7 +83,7 @@ async def main():
         pass
 
     logger.info(
-        "Register worker on task queue: %s namespace: %s",
+        "Register worker on task queue: {} namespace: {}",
         settings.temporal.TASK_QUEUE,
         settings.temporal.NAMESPACE,
     )

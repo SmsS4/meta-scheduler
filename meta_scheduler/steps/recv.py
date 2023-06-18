@@ -49,7 +49,7 @@ class Workflow:
                 )
                 await workflow.execute_child_workflow(
                     persiste_to_db.Workflow.run,
-                    args=[xml, inp.strategy.name],
+                    args=[xml, f"{inp.strategy.name} ({symbol})"],
                     id=stepping.get_id("persiste"),
                 )
 

@@ -23,7 +23,7 @@ def run(
     shell: bool = False,
 ) -> Result:
     commands_as_list = list(command)
-    logger.info("running %s", " ".join(commands_as_list))
+    logger.info("running {}", " ".join(commands_as_list))
     if stdin is not None and isinstance(stdin, str):
         stdin = stdin.encode()
     try:
@@ -33,11 +33,11 @@ def run(
             timeout=timeout,
             input=stdin,
         )
-        logger.debug("stdout: %s", res)
+        logger.debug("stdout: {}", res)
         return Result(res.decode(), "", 0)
     except subprocess.CalledProcessError as cpe:
         logger.error(
-            "stdout: %s\nstderr: %s\nreturn code: %s",
+            "stdout: {}\nstderr: {}\nreturn code: {}",
             cpe.stderr,
             cpe.stdout,
             cpe.returncode,
