@@ -26,7 +26,7 @@ async def parse_xml(xml_file: file.File) -> opt.OptResult:
     ]
     headers = list(map(str.lower, headers))
     headers = list(map(lambda x: x.replace(" ", "_"), headers))
-    data = {header: [] for header in headers}
+    data: dict[str, list] = {header: [] for header in headers}
     for raw_row in rows[1:]:
         row = raw_row["Cell"]
         if len(row) != len(headers):

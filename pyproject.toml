@@ -23,6 +23,7 @@ pandas = "^2.0.2"
 prometheus-client = "^0.17.0"
 prometheus-fastapi-instrumentator = "^6.0.0"
 opentelemetry-exporter-otlp = "^1.18.0"
+streamlit-authenticator = "^0.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "7.3.0"

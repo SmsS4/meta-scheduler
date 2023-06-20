@@ -31,7 +31,7 @@ class Output:
 @workflow.defn(name=NAME)
 class Workflow:
     @workflow.run
-    async def run(self, inp: Input) -> Output:
+    async def run(self, inp: Input):
         for i, symbol in enumerate(inp.symbols):
             metrics.recived_strategy.labels(symbol).inc()
             metrics.progress.set(i / len(inp.symbols))
