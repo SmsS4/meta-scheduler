@@ -3,7 +3,6 @@ from uuid import uuid4
 
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
-from temporalio.client import Client
 
 from backend import schemas
 from meta_scheduler import models

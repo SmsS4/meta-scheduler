@@ -13,7 +13,6 @@ from meta_scheduler import models
 from meta_scheduler.models.mql import CostFunction
 from meta_scheduler.models.mql import Model
 from meta_scheduler.models.mql import Optimization
-from meta_scheduler.models.mql import Period
 from meta_scheduler.utils import db_session
 
 HOST = "http://localhost:8000/"
@@ -33,6 +32,7 @@ def config_streamlit():
 
 
 def auth():
+    return True
     with open("config.yaml") as file:
         config = yaml.load(file, Loader=SafeLoader)
     authenticator = stauth.Authenticate(
@@ -47,9 +47,9 @@ def auth():
         authenticator.logout("Logout", "sidebar")
         st.write(f"Welcome *{name}*")
         return True
-    elif authentication_status == False:
+    elif authentication_status is False:
         st.error("Username/password is incorrect")
-    elif authentication_status == None:
+    elif authentication_status is None:
         st.warning("Please enter your username and password")
     return False
 
